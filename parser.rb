@@ -27,7 +27,11 @@ class Str < Atom
   end
 end
 
-class Nil < Atom
+
+class Ident < Atom
+end
+
+class Nil < Ident
   include Singleton
 
   def initialize
@@ -42,7 +46,19 @@ class Nil < Atom
   end
 end
 
-class Ident < Atom
+class True < Ident
+  include Singleton
+  def initialize
+    super(true)
+  end
+
+  def value_inspect
+    "t"
+  end
+
+  def inspect
+    "t"
+  end
 end
 
 class Cons < Node
@@ -103,11 +119,12 @@ class Parser
 
   # s_expr       := atomic_symbol
   #              | list
-  #              | nil
   # list         := "(" s_expr* ")"
   # atomi_symbol := number
   #              |  string
   #              |  ident
+  #              |  t
+  #              |  nil
   def parse
     s_expr
   end
@@ -141,9 +158,16 @@ class Parser
         next_token
       }
     when :tk_ident
-      Ident.new(@token.value).tap {
-        next_token
-      }
+      ident = case @token.value
+              when "t"
+                True.instance
+              when "nil"
+                Nil.instance
+              else
+                Ident.new(@token.value)
+              end
+      next_token
+      ident
     else
       nil
     end

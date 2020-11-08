@@ -36,19 +36,19 @@ class Evaluator
 
   def setup_builtin
     @scope.add("atom", -> (expr) {
-      Atom === expr
+      Atom === expr ? True.instance : Nil.instance
     })
-    @scope.add("eq", -> (e1, e2) {
-      e1 == e2
+    @scope.add("eq", -> (args) {
+      eval(args.car) == eval(args.cdr.car) ? True.instance : Nil.instance
     })
     @scope.add("car", -> (cons) {
-      cons.car
+      eval(cons).car
     })
     @scope.add("cdr", -> (cons) {
-      cons.cdr
+      eval(cons).cdr
     })
     @scope.add("cons", -> (car, cdr) {
-      Cons.new(car, cdr)
+      Cons.new(eval(car), eval(cdr))
     })
     @scope.add("+", -> (list) {
       sum = 0
@@ -132,9 +132,9 @@ class Printer
   def my_inspect(expr)
     case expr
     when Atom
-      expr.value
+      expr.value_inspect
     when Cons
-      expr.inspect_value
+      expr.value_inspect
     end
   end
 end
