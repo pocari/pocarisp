@@ -63,6 +63,8 @@ class Tokenizer
       new_token(:tk_rparen)
     when @s.match?(IDENT_PREFIX_REGEXP)
       new_token(:tk_ident, tokenize_ident)
+    when @s.empty?
+      new_token(:tk_eof)
     else
       raise "unknown token"
     end

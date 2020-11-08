@@ -102,4 +102,16 @@ EOS
     assert_equal :tk_ident, token.type
     assert_equal "*var*", token.value
   end
+
+  def test_eof
+    tk = Tokenizer.new('123')
+
+    token = tk.next
+    assert_equal :tk_num, token.type
+    assert_equal 123, token.value
+
+    token = tk.next
+    assert_equal :tk_eof, token.type
+    assert_nil token.value
+  end
 end
