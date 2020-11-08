@@ -78,4 +78,28 @@ class TokenizerTest <  MiniTest::Test
           unterminated string literal
 EOS
   end
+
+  def test_tokenize_variable1
+    tk = Tokenizer.new('hoge')
+
+    token = tk.next
+    assert_equal :tk_ident, token.type
+    assert_equal "hoge", token.value
+  end
+
+  def test_tokenize_variable2
+    tk = Tokenizer.new('a0')
+
+    token = tk.next
+    assert_equal :tk_ident, token.type
+    assert_equal "a0", token.value
+  end
+
+  def test_tokenize_variable3
+    tk = Tokenizer.new('*var*')
+
+    token = tk.next
+    assert_equal :tk_ident, token.type
+    assert_equal "*var*", token.value
+  end
 end

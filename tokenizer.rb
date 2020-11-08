@@ -45,6 +45,10 @@ class Tokenizer
     tokenize
   end
 
+  # /+ - * / @ $ % ^ & _ = < > ~ .
+  IDENT_PREFIX_REGEXP = Regexp.compile('[a-zA-Z+\\-*/@$%^&_=<>~.]')
+  # 上記に加えて、数値も含めた文字の1文字以上の繰り返し
+  IDENT_REGEXP = Regexp.compile('[a-zA-Z+\\-*/@$%^&_=<>~.0-9]+')
   def tokenize
     @s.skip(/\s*/)
     @current_token_pos = @s.pos
@@ -57,9 +61,15 @@ class Tokenizer
       new_token(:tk_lparen)
     when @s.scan(/\)/)
       new_token(:tk_rparen)
+    when @s.match?(IDENT_PREFIX_REGEXP)
+      new_token(:tk_ident, tokenize_ident)
     else
       raise "unknown token"
     end
+  end
+
+  def tokenize_ident
+    @s.scan(IDENT_REGEXP)
   end
 
   def tokenize_num
