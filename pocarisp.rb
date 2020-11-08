@@ -6,7 +6,7 @@ end
 
 class Tokenizer
   def initialize(input)
-    @scanner = StringScanner.new(input)
+    @s = StringScanner.new(input)
   end
 
   def next
@@ -14,12 +14,42 @@ class Tokenizer
   end
 
   def tokenize
-    s = @scanner
     case
-    when tk = s.scan(/\d+/)
-      [:tk_str, tk.to_i]
+    when @s.match?(/^\d/)
+      [:tk_num, tokenize_num]
+    when @s.match?(/\A"/)
+      [:tk_str, tokenize_str]
     else
       raise "unknown token"
+    end
+  end
+
+  def tokenize_num
+    tk = @s.scan(/\d+/)
+    tk.to_i
+  end
+
+  def tokenize_str
+    tk = @s.scan(/"/)
+    buf = []
+    while ch = @s.getch
+      case ch
+      when '"'
+        return buf.join
+      when '\\'
+        case c2 = @s.getch
+        when 'n'
+          buf << "\n"
+        when 't'
+          buf << "\t"
+        when 'b'
+          buf << "\b"
+        else
+          buf << c2
+        end
+      else
+        buf << ch
+      end
     end
   end
 end
