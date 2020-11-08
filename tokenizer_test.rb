@@ -1,8 +1,8 @@
 require 'pry-byebug'
 require 'minitest/autorun'
-require_relative 'pocarisp'
+require_relative 'tokenizer'
 
-class RispTest <  MiniTest::Test
+class TokenizerTest <  MiniTest::Test
   def test_read_number
     tk = Tokenizer.new("123")
 
