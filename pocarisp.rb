@@ -4,6 +4,7 @@ def read_all(f = $stdin)
   f.read
 end
 
+Token = Struct.new(:type, :value, :pos)
 class Tokenizer
   class TokenizeError < StandardError
     def initialize(input, pos, msg)
@@ -55,13 +56,13 @@ class Tokenizer
     @current_token_pos = @s.pos
     case
     when @s.match?(/\d/)
-      [:tk_num, tokenize_num]
+      new_token(:tk_num, tokenize_num)
     when @s.match?(/"/)
-      [:tk_str, tokenize_str]
+      new_token(:tk_str, tokenize_str)
     when @s.scan(/\(/)
-      [:tk_lparen, nil]
+      new_token(:tk_lparen)
     when @s.scan(/\)/)
-      [:tk_rparen, nil]
+      new_token(:tk_rparen)
     else
       raise "unknown token"
     end
@@ -105,6 +106,10 @@ class Tokenizer
       @s.pos,
       msg
     )
+  end
+
+  def new_token(type, val = nil)
+    Token.new(type, val, @current_token_pos)
   end
 end
 

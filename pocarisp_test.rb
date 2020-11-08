@@ -5,32 +5,50 @@ require_relative 'pocarisp'
 class RispTest <  MiniTest::Test
   def test_read_number
     tk = Tokenizer.new("123")
-    assert_equal [:tk_num, 123], tk.next
+
+    token = tk.next
+    assert_equal :tk_num, token.type
+    assert_equal 123, token.value
   end
 
   def test_read_str
     tk = Tokenizer.new('"this is a string"')
-    assert_equal [:tk_str, "this is a string"], tk.next
+
+    token = tk.next
+    assert_equal :tk_str, token.type
+    assert_equal "this is a string" , token.value
   end
 
   def test_read_str_with_escaped
     tk = Tokenizer.new('"this is \ta \n string"')
-    assert_equal [:tk_str, "this is \ta \n string"], tk.next
+
+    token = tk.next
+    assert_equal :tk_str, token.type
+    assert_equal "this is \ta \n string" , token.value
   end
 
   def test_read_lparen
     tk = Tokenizer.new('(')
-    assert_equal [:tk_lparen, nil], tk.next
+
+    token = tk.next
+    assert_equal :tk_lparen, token.type
+    assert_nil token.value
   end
 
   def test_read_rparen
     tk = Tokenizer.new(')')
-    assert_equal [:tk_rparen, nil], tk.next
+
+    token = tk.next
+    assert_equal :tk_rparen, token.type
+    assert_nil token.value
   end
 
   def test_ignore_white_space
     tk = Tokenizer.new('   12 \t\n  ')
-    assert_equal [:tk_num, 12], tk.next
+
+    token = tk.next
+    assert_equal :tk_num, token.type
+    assert_equal 12, token.value
   end
 
   def test_error_unterminated_string
@@ -40,8 +58,14 @@ class RispTest <  MiniTest::Test
     "foooo
     EOS
 
-    assert_equal [:tk_num, 123], tk.next
-    assert_equal [:tk_str, "hoge"], tk.next
+    token = tk.next
+    assert_equal :tk_num, token.type
+    assert_equal 123, token.value
+
+    token = tk.next
+    assert_equal :tk_str, token.type
+    assert_equal "hoge", token.value
+
     e = assert_raises Tokenizer::TokenizeError do
       p tk.next
     end
