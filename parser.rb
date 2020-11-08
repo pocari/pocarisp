@@ -1,3 +1,4 @@
+require 'singleton'
 require_relative 'tokenizer'
 
 class Node
@@ -27,18 +28,72 @@ class Str < Atom
   end
 end
 
-class Ident < Atom
-end
+class Nil < Atom
+  include Singleton
 
-class List < Node
-  attr_reader :special
-  def initialize(token, val, special)
-    super(token, val)
-    @special = special
+  def initialize
+    super(nil, nil)
   end
 
   def value_inspect
-    value.map {|e| e.inspect }.join(" ")
+    "nil"
+  end
+
+  def inspect
+    "Nil"
+  end
+end
+
+class Ident < Atom
+end
+
+class Cons < Node
+  attr_reader :car, :cdr, :special
+  def initialize(token, car, cdr)
+    super(token, nil)
+    @car = car
+    @cdr = cdr
+    @special = false
+  end
+
+  def value_inspect
+    return Nil.instance if self == Nil.instance
+
+    ret = []
+    my_each_cons do |car|
+      ret << car.inspect
+    end
+
+    ret.join(" ")
+  end
+
+  def value
+    return Nil.instance if self == Nil.instance
+    ret = []
+    my_each_cons do |car|
+      ret << car.value
+    end
+
+    ret
+  end
+
+  def my_each_cons
+    ret = []
+    c = self
+    while c != Nil.instance
+      yield c.car
+      c = c.cdr
+    end
+  end
+
+  def reverse
+    cur = Nil.instance
+    n = self
+    while n != Nil.instance
+      cur = Cons.new(n.car.token, n.car, cur)
+      n = n.cdr
+    end
+    cur
   end
 end
 
@@ -52,33 +107,30 @@ class Parser
 
   # s_expr       := atomic_symbol
   #              | list
+  #              | nil
   # list         := "(" s_expr* ")"
   # atomi_symbol := number
   #              |  string
   #              |  ident
   def parse
+    s_expr
+  end
+
+  def s_expr
     atom = parse_atomic_symbol
     return atom if atom
     parse_list
   end
 
-
   def parse_list
     tk = expect(:tk_lparen)
-    list = List.new(tk, [], false)
-
+    cons =  Nil.instance
     loop do
-      list.value << parse
-      if peek(:tk_rparen)
-        break
-      end
-
-      if peek(:tk_eof)
-        raise ParseError, "unexpected eof"
-      end
+      e = s_expr
+      cons = Cons.new(e.token, e, cons)
+      return cons.reverse if match(:tk_rparen)
+      raise ParseError, 'unexpected EOF' if match(:tk_eof)
     end
-
-    list
   end
 
   def parse_atomic_symbol
@@ -104,6 +156,10 @@ class Parser
     @token = @t.next
   end
 
+  def reset_token(tk)
+    @t.reset_token(tk.pos)
+  end
+
   def expect(tk_type)
     unless peek(tk_type)
       raise ParseError, "unexpected token: #{@token}"
@@ -111,6 +167,12 @@ class Parser
     @token.tap { next_token }
   end
 
+  def match(tk_type)
+    unless peek(tk_type)
+      return
+    end
+    @token.tap { next_token }
+  end
   def peek(tk_type)
     @token.type == tk_type
   end

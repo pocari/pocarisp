@@ -34,12 +34,21 @@ class ParserTest <  MiniTest::Test
     assert_equal "(Ident *ident*)", ret.inspect
   end
 
-  def test_ident_parser
+  def test_cons_parser
     parser = gen_parser('(1 "hoge" foo)')
 
     ret = parser.parse
-    assert_equal List, ret.class
-    assert_equal [1, "hoge", "foo"], ret.value.map(&:value)
-    assert_equal "(List (Num 1) (Str \"hoge\") (Ident foo))", ret.inspect
+    assert_equal Cons, ret.class
+    assert_equal [1, "hoge", "foo"], ret.value
+    assert_equal "(Cons (Num 1) (Str \"hoge\") (Ident foo))", ret.inspect
+  end
+
+  def test_nested_cons_parser
+    parser = gen_parser('(1 (2 (3 4) 5) 6))')
+
+    ret = parser.parse
+    assert_equal Cons, ret.class
+    assert_equal [1, [2, [3, 4], 5], 6], ret.value
+    assert_equal "(Cons (Num 1) (Cons (Num 2) (Cons (Num 3) (Num 4)) (Num 5)) (Num 6))", ret.inspect
   end
 end

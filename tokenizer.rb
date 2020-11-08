@@ -117,5 +117,9 @@ class Tokenizer
   def new_token(type, val = nil)
     Token.new(type, val, @current_token_pos)
   end
+
+  def reset_token(pos)
+    @current_token_pos = @s.pos = pos
+  end
 end
 

@@ -114,4 +114,30 @@ EOS
     assert_equal :tk_eof, token.type
     assert_nil token.value
   end
+
+  def test_eof
+    tk = Tokenizer.new('123 456 789')
+
+    first_token = token = tk.next
+    assert_equal :tk_num, token.type
+    assert_equal 123, token.value
+
+    token = tk.next
+    assert_equal :tk_num, token.type
+    assert_equal 456, token.value
+
+    tk.reset_token(first_token.pos)
+
+    token = tk.next
+    assert_equal :tk_num, token.type
+    assert_equal 123, token.value
+
+    token = tk.next
+    assert_equal :tk_num, token.type
+    assert_equal 456, token.value
+
+    token = tk.next
+    assert_equal :tk_num, token.type
+    assert_equal 789, token.value
+  end
 end
