@@ -169,10 +169,12 @@ class Parser
 
   def match(tk_type)
     unless peek(tk_type)
-      return
+      return false
     end
     @token.tap { next_token }
+    true
   end
+
   def peek(tk_type)
     @token.type == tk_type
   end
