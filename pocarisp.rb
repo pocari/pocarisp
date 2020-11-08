@@ -54,17 +54,39 @@ class Evaluator
       sum = 0
       c = list
       while c != Nil.instance
-        sum += eval(c.car)
+        sum += eval(c.car).value
         c = c.cdr
       end
-      sum
+      Num.new(sum)
+    })
+    @scope.add("-", -> (list) {
+      raise 'too few arguments given to -' if list == Nil.instance
+      sum = eval(list.car).value
+      if list.cdr == Nil.instance
+        return Num.new(-sum)
+      end
+
+      while c != Nil.instance
+        sum -= eval(c.car).value
+        c = c.cdr
+      end
+      Num.new(sum)
+    })
+    @scope.add("*", -> (list) {
+      prod = 1
+      c = list
+      while c != Nil.instance
+        prod *= eval(c.car).value
+        c = c.cdr
+      end
+      Num.new(prod)
     })
   end
 
   def eval(expr)
     case expr
     when Atom
-      expr.value
+      expr
     when Cons
       eval_list(expr)
     end
@@ -102,16 +124,32 @@ class Evaluator
   end
 end
 
+class Printer
+  def print(expr)
+    puts my_inspect(expr)
+  end
+
+  def my_inspect(expr)
+    case expr
+    when Atom
+      expr.value
+    when Cons
+      expr.inspect_value
+    end
+  end
+end
+
 require 'stringio'
 def main
   e = Evaluator.new
+  printer = Printer.new
   loop do
     print "> "
     line = gets
     break unless line
     parser = Parser.new(Tokenizer.new(read_all(StringIO.new(line))))
     s_expr = parser.parse
-    p e.eval(s_expr)
+    printer.print(e.eval(s_expr))
   end
 end
 
