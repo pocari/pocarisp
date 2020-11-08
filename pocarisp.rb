@@ -1,7 +1,7 @@
 require 'strscan'
 
-def read_all
-  $stdin.read
+def read_all(f = $stdin)
+  f.read
 end
 
 class Tokenizer
@@ -17,7 +17,7 @@ class Tokenizer
     s = @scanner
     case
     when tk = s.scan(/\d+/)
-      tk.to_i
+      [:tk_str, tk.to_i]
     else
       raise "unknown token"
     end
