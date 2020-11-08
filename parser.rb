@@ -2,9 +2,8 @@ require 'singleton'
 require_relative 'tokenizer'
 
 class Node
-  attr_reader :token, :value
-  def initialize(token, val)
-    @token = token
+  attr_reader :value
+  def initialize(val)
     @value = val
   end
 
@@ -32,7 +31,6 @@ class Nil < Atom
   include Singleton
 
   def initialize
-    super(nil, nil)
   end
 
   def value_inspect
@@ -48,12 +46,10 @@ class Ident < Atom
 end
 
 class Cons < Node
-  attr_reader :car, :cdr, :special
-  def initialize(token, car, cdr)
-    super(token, nil)
+  attr_reader :car, :cdr
+  def initialize(car, cdr)
     @car = car
     @cdr = cdr
-    @special = false
   end
 
   def value_inspect
@@ -90,7 +86,7 @@ class Cons < Node
     cur = Nil.instance
     n = self
     while n != Nil.instance
-      cur = Cons.new(n.car.token, n.car, cur)
+      cur = Cons.new(n.car, cur)
       n = n.cdr
     end
     cur
@@ -128,7 +124,7 @@ class Parser
     cons =  Nil.instance
     loop do
       e = s_expr
-      cons = Cons.new(e.token, e, cons)
+      cons = Cons.new(e, cons)
       return cons.reverse if match(:tk_rparen)
       raise ParseError, 'unexpected EOF' if match(:tk_eof)
     end
@@ -137,15 +133,15 @@ class Parser
   def parse_atomic_symbol
     case @token.type
     when :tk_num
-      Num.new(@token, @token.value).tap {
+      Num.new(@token.value).tap {
         next_token
       }
     when :tk_str
-      Str.new(@token, @token.value).tap {
+      Str.new(@token.value).tap {
         next_token
       }
     when :tk_ident
-      Ident.new(@token, @token.value).tap {
+      Ident.new(@token.value).tap {
         next_token
       }
     else
