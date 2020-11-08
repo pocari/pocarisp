@@ -124,6 +124,7 @@ class Parser
 
   def parse_list
     tk = expect(:tk_lparen)
+    return Nil.instance if match(:tk_rparen)
     cons =  Nil.instance
     loop do
       e = s_expr

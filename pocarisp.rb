@@ -39,8 +39,12 @@ class Evaluator
     when Atom
       expr.value
     when List
-      
+      eval_list(expr)
     end
+  end
+
+  def eval_list(list)
+
   end
 end
 

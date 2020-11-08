@@ -51,4 +51,13 @@ class ParserTest <  MiniTest::Test
     assert_equal [1, [2, [3, 4], 5], 6], ret.value
     assert_equal "(Cons (Num 1) (Cons (Num 2) (Cons (Num 3) (Num 4)) (Num 5)) (Num 6))", ret.inspect
   end
+
+  def test_empty_cons
+    parser = gen_parser('()')
+
+    ret = parser.parse
+    assert_equal Nil, ret.class
+    assert_nil ret.value
+    assert_equal "Nil", ret.inspect
+  end
 end
