@@ -104,13 +104,13 @@ end
 
 require 'stringio'
 def main
+  e = Evaluator.new
   loop do
     print "> "
     line = gets
     break unless line
     parser = Parser.new(Tokenizer.new(read_all(StringIO.new(line))))
     s_expr = parser.parse
-    e = Evaluator.new
     p e.eval(s_expr)
   end
 end
