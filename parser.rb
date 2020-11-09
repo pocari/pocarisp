@@ -12,6 +12,18 @@ class Node
   end
 end
 
+class Lambda < Node
+  attr_reader :args, :form
+  def initialize(args, form)
+    @args = args
+    @form = form
+  end
+
+  def value_inspect
+    "(lambda #{@args.value_inspect} #{@form&.value_inspect})"
+  end
+end
+
 class Atom < Node
   def value_inspect
     value
