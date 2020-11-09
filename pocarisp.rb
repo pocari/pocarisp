@@ -81,6 +81,9 @@ class Evaluator
       end
       Num.new(prod)
     })
+    @scope.add("quote", -> (list) {
+      list.car
+    })
   end
 
   def eval(expr)
@@ -134,7 +137,13 @@ class Printer
     when Atom
       expr.value_inspect
     when Cons
-      expr.value_inspect
+      c = expr
+      ret = []
+      while c != Nil.instance
+        ret << my_inspect(c.car)
+        c = c.cdr
+      end
+      "(#{ret.join(' ')})"
     end
   end
 end
