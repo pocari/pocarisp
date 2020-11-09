@@ -72,38 +72,38 @@ class Evaluator
     })
 
     @scope.add("+", -> (list) {
-      sum = 0
+      result = 0
       c = list
       while !lnil?(c)
-        sum += eval(c.car).value
+        result += eval(c.car).value
         c = c.cdr
       end
-      Num.new(sum)
+      Num.new(result)
     })
 
     @scope.add("-", -> (list) {
       raise 'too few arguments given to -' if lnil?(list)
-      sum = eval(list.car).value
+      result = eval(list.car).value
       if lnil?(list.cdr)
-        return Num.new(-sum)
+        return Num.new(-result)
       end
 
       c = list.cdr
       while !lnil?(c)
-        sum -= eval(c.car).value
+        result -= eval(c.car).value
         c = c.cdr
       end
-      Num.new(sum)
+      Num.new(result)
     })
 
     @scope.add("*", -> (list) {
-      prod = 1
+      result = 1
       c = list
       while !lnil?(c)
-        prod *= eval(c.car).value
+        result *= eval(c.car).value
         c = c.cdr
       end
-      Num.new(prod)
+      Num.new(result)
     })
 
     @scope.add("quote", -> (list) {
