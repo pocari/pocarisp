@@ -34,53 +34,78 @@ class Evaluator
     setup_builtin
   end
 
+  def lnil
+    Nil.instance
+  end
+
+  def lnil?(c)
+    c == lnil
+  end
+
+  def ltrue?(c)
+    !lnil?(c)
+  end
+
+  def ltrue
+    True.instance
+  end
+
   def setup_builtin
     @scope.add("atom", -> (expr) {
-      Atom === expr ? True.instance : Nil.instance
+      Atom === expr ? ltrue : lnil
     })
+
     @scope.add("eq", -> (args) {
-      eval(args.car) == eval(args.cdr.car) ? True.instance : Nil.instance
+      eval(args.car) == eval(args.cdr.car) ? ltrue : lnil
     })
+
     @scope.add("car", -> (cons) {
       eval(cons).car
     })
+
     @scope.add("cdr", -> (cons) {
       eval(cons).cdr
     })
+    
     @scope.add("cons", -> (car, cdr) {
       Cons.new(eval(car), eval(cdr))
     })
+
     @scope.add("+", -> (list) {
       sum = 0
       c = list
-      while c != Nil.instance
+      while !lnil?(c)
         sum += eval(c.car).value
         c = c.cdr
       end
       Num.new(sum)
     })
+
     @scope.add("-", -> (list) {
-      raise 'too few arguments given to -' if list == Nil.instance
+      raise 'too few arguments given to -' if lnil?(list)
       sum = eval(list.car).value
-      if list.cdr == Nil.instance
+      if lnil?(list.cdr)
         return Num.new(-sum)
       end
 
-      while c != Nil.instance
+      c = list.cdr
+      while !lnil?(c)
         sum -= eval(c.car).value
         c = c.cdr
       end
       Num.new(sum)
     })
+
     @scope.add("*", -> (list) {
       prod = 1
       c = list
-      while c != Nil.instance
+      while !lnil?(c)
         prod *= eval(c.car).value
         c = c.cdr
       end
       Num.new(prod)
     })
+
     @scope.add("quote", -> (list) {
       list.car
     })
@@ -139,7 +164,7 @@ class Printer
     when Cons
       c = expr
       ret = []
-      while c != Nil.instance
+      while c != lnil
         ret << my_inspect(c.car)
         c = c.cdr
       end
