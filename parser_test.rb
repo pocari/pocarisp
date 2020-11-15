@@ -60,4 +60,12 @@ class ParserTest <  MiniTest::Test
     assert_nil ret.value
     assert_equal "Nil", ret.inspect
   end
+
+  def test_empty_cons2
+    parser = gen_parser('(defun hoge (x) x)')
+    p parser.parse
+
+    parser = gen_parser('(defun hoge (x) (+ 1 x))')
+    p parser.parse
+  end
 end

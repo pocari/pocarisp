@@ -13,14 +13,15 @@ class Node
 end
 
 class Lambda < Node
-  attr_reader :args, :form
-  def initialize(args, form)
+  attr_reader :env, :args, :form
+  def initialize(env, args, form)
+    @env  = env
     @args = args
     @form = form
   end
 
   def value_inspect
-    "(lambda #{@args.value_inspect} #{@form&.value_inspect})"
+    "(lambda (#{@args.value_inspect}) #{@form&.value_inspect})"
   end
 end
 
