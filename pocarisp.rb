@@ -146,6 +146,17 @@ class Evaluator
       e.add(ident.value, eval(env, value))
     })
 
+    env.add("progn", -> (e, list) {
+      c = list
+      ret = lnil
+      while !lnil?(c)
+        ret = eval(e, c.car)
+        c = c.cdr
+      end
+
+      ret
+    })
+
     env.add("dump_env", -> (e, _) {
       # p [:dump_env, e.keys]
       lnil
