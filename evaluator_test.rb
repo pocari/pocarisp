@@ -97,7 +97,7 @@ class ParserTest <  MiniTest::Test
     assert_equal 7, ret.value
   end
 
-  def test_eval_setq
+  def test_eval_progn
     ret = eval_expr(<<~EOS)
     (progn
       (setq a 2)
@@ -119,5 +119,16 @@ class ParserTest <  MiniTest::Test
     EOS
     assert_equal Num, ret.class
     assert_equal 7, ret.value
+  end
+
+  def test_defun
+    ret = eval_expr(<<~EOS)
+    (defun hoge (a b c)
+      (setq d (+ a b c))
+      (* d 2))
+    (hoge 1 2 3)
+    EOS
+    assert_equal Num, ret.class
+    assert_equal 12, ret.value
   end
 end

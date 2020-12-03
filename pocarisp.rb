@@ -66,7 +66,7 @@ class Evaluator
     })
 
     env.add("eq", -> (e, args) {
-      eval(e, args.car) == eval(env, args.cdr.car) ? ltrue : lnil
+      eval(e, args.car) == eval(e, args.cdr.car) ? ltrue : lnil
     })
 
     env.add("car", -> (e, cons) {
@@ -78,7 +78,7 @@ class Evaluator
     })
 
     env.add("cons", -> (e, car, cdr) {
-      Cons.new(eval(e, car), eval(env, cdr))
+      Cons.new(eval(e, car), eval(e, cdr))
     })
 
     env.add("+", -> (e, list) {
@@ -132,18 +132,19 @@ class Evaluator
       # p [:name, name]
       # p [:lambda_form, lambda_form]
       sub_env = e.sub_env
-      e.add(name.value, Lambda.new(sub_env, lambda_form.car, lambda_form.cdr))
+      body = Cons.new(Ident.new('progn'), lambda_form.cdr)
+      e.add(name.value, Lambda.new(sub_env, lambda_form.car, body))
     })
 
-    env.add("funcall", -> (env, list) {
+    env.add("funcall", -> (e, list) {
       # p [:list, list]
-      eval_cons(env, list)
+      eval_cons(e, list)
     })
 
     env.add("setq", -> (e, list) {
       ident = list.car
       value = list.cdr.car
-      e.add(ident.value, eval(env, value))
+      e.add(ident.value, eval(e, value))
     })
 
     env.add("progn", -> (e, list) {
@@ -210,7 +211,7 @@ class Evaluator
       lambda_env.add(k.value, v)
     end
     # p [:lambda_call, lambda_env.keys, f.form.car]
-    eval(lambda_env, f.form.car)
+    eval(lambda_env, f.form)
   end
 
   def eval_list(env, list)
