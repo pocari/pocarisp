@@ -20,8 +20,12 @@ class ParserTest <  MiniTest::Test
 
   def eval_expr(line)
     parser = Parser.new(Tokenizer.new(read_all(StringIO.new(line))))
-    s_expr = parser.parse
-    @e.eval(@root_env, s_expr)
+    ret = parser.parse
+    result = nil
+    ret.each do |s_expr|
+      result = @e.eval(@root_env, s_expr)
+    end
+    result
   end
 
   def test_eval_number
@@ -88,6 +92,30 @@ class ParserTest <  MiniTest::Test
       (setq c (+ 1 a b))
       (+ 1 c)
     )
+    EOS
+    assert_equal Num, ret.class
+    assert_equal 7, ret.value
+  end
+
+  def test_eval_setq
+    ret = eval_expr(<<~EOS)
+    (progn
+      (setq a 2)
+      (setq b 3)
+      (setq c (+ 1 a b))
+      (+ 1 c)
+    )
+    EOS
+    assert_equal Num, ret.class
+    assert_equal 7, ret.value
+  end
+
+  def test_multiple_expr
+    ret = eval_expr(<<~EOS)
+      (setq a 2)
+      (setq b 3)
+      (setq c (+ 1 a b))
+      (+ 1 c)
     EOS
     assert_equal Num, ret.class
     assert_equal 7, ret.value

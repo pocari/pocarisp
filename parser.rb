@@ -130,6 +130,8 @@ class Parser
     @token = @t.next
   end
 
+  # s_expr_list  := s_expr*
+  #              | EOF
   # s_expr       := atomic_symbol
   #              | list
   # list         := "(" s_expr* ")"
@@ -139,24 +141,39 @@ class Parser
   #              |  t
   #              |  nil
   def parse
-    s_expr
+    s_expr_list
+  end
+
+  def s_expr_list
+    exprs = []
+    while e = s_expr
+      break if e == :tk_eof
+      exprs << e
+    end
+    exprs
   end
 
   def s_expr
     atom = parse_atomic_symbol
     return atom if atom
-    parse_list
+    list = parse_list
+    return list if list
   end
 
   def parse_list
-    tk = expect(:tk_lparen)
-    return Nil.instance if match(:tk_rparen)
-    cons =  Nil.instance
-    loop do
-      e = s_expr
-      cons = Cons.new(e, cons)
-      return cons.reverse if match(:tk_rparen)
-      raise ParseError, 'unexpected EOF' if match(:tk_eof)
+    if peek(:tk_lparen)
+      tk = expect(:tk_lparen)
+      return Nil.instance if match(:tk_rparen)
+      cons =  Nil.instance
+      loop do
+        e = s_expr
+        cons = Cons.new(e, cons)
+        return cons.reverse if match(:tk_rparen)
+        raise ParseError, 'unexpected EOF' if match(:tk_eof)
+      end
+    else
+      expect(:tk_eof)
+      :tk_eof
     end
   end
 
