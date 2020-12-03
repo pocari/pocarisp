@@ -262,8 +262,10 @@ def main
     line = gets
     break unless line
     parser = Parser.new(Tokenizer.new(read_all(StringIO.new(line))))
-    s_expr = parser.parse
-    printer.print(e.eval(root_env, s_expr))
+    s_expr_list = parser.parse
+    s_expr_list.each do |s_expr|
+      printer.print(e.eval(root_env, s_expr))
+    end
   end
 end
 
