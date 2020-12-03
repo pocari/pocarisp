@@ -66,7 +66,7 @@ class ParserTest <  MiniTest::Test
     (+ 4 5 6)
     EOS
 
-    ret =  parser.parse.shift
+    ret =  parser.parse
     assert_equal "(Cons (Ident +) (Num 1) (Num 2) (Num 3))", ret.shift.inspect
     assert_equal "(Cons (Ident +) (Num 4) (Num 5) (Num 6))", ret.shift.inspect
     assert_nil ret.shift
