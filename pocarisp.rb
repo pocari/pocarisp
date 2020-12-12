@@ -177,8 +177,27 @@ class Evaluator
 
     env.add("princ", -> (e, list) {
       c = list.car
-      puts(c.value)
+      puts(eval(e, c).value)
       c
+    })
+
+    env.add("eq", -> (e, list) {
+      x = list.car
+      y = list.cdr.car
+      eval(e, x) == eval(e, y) ? ltrue : lnil
+    })
+
+    # 数値用の比較
+    env.add("=", -> (e, list) {
+      x = list.car
+      y = list.cdr.car
+      objx = eval(e, x)
+      objy = eval(e, y)
+
+      if Num != objx.class || Num != objy.class
+        raise "args must be Num"
+      end
+      objx.value == objy.value ? ltrue : lnil
     })
   end
 
