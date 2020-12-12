@@ -86,11 +86,9 @@ class Evaluator
     })
 
     env.add("+", -> (e, list) {
-      # p [:+, list]
       result = 0
       c = list
       while !lnil?(c)
-        # p [:hoge_env, e.keys]
         result += eval(e, c.car).value
         c = c.cdr
       end
@@ -133,15 +131,12 @@ class Evaluator
     env.add("defun", -> (e, list) {
       name = list.car
       lambda_form = list.cdr
-      # p [:name, name]
-      # p [:lambda_form, lambda_form]
       sub_env = e.sub_env
       body = Cons.new(Ident.new('progn'), lambda_form.cdr)
       e.add(name.value, Lambda.new(sub_env, lambda_form.car, body))
     })
 
     env.add("funcall", -> (e, list) {
-      # p [:list, list]
       eval_cons(e, list)
     })
 
@@ -180,11 +175,6 @@ class Evaluator
       end
     })
 
-    env.add("dump_env", -> (e, _) {
-      # p [:dump_env, e.keys]
-      lnil
-    })
-
   end
 
   def eval(env, expr)
@@ -192,7 +182,6 @@ class Evaluator
     when Nil
       lnil
     when Ident
-      # p [:find_var, expr.value, @scope]
       env.find(expr.value)
     when Atom
       expr
@@ -202,8 +191,6 @@ class Evaluator
   end
 
   def eval_cons(env, list)
-    # p [:eval_cons_list, list]
-    # p [:eval_cons_list_car, list.car]
     f = eval(env, list.car)
     case f
     when Lambda
@@ -216,13 +203,9 @@ class Evaluator
   end
 
   def apply_lambda(env, f, args)
-    # p [:apply_lambda]
-    # p [:f_args, f.args]
-    # p [:f_form, f.form]
-    # p [:args, args]
-
     eargs = eval_list(env, args)
     fargs = f.args
+
     arg_list = []
     while non_lnil?(fargs) && non_lnil?(eargs)
       arg_list << [fargs.car, eargs.car]
@@ -234,7 +217,6 @@ class Evaluator
     arg_list.each do |k, v|
       lambda_env.add(k.value, v)
     end
-    # p [:lambda_call, lambda_env.keys, f.form.car]
     eval(lambda_env, f.form)
   end
 
@@ -242,7 +224,6 @@ class Evaluator
     cur = list
     ret = lnil
     while non_lnil?(cur)
-      # p [:hoge, cur.car]
       ret = Cons.new(eval(env, cur.car), ret)
       cur = cur.cdr
     end
