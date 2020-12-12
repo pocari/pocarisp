@@ -175,6 +175,11 @@ class Evaluator
       end
     })
 
+    env.add("princ", -> (e, list) {
+      c = list.car
+      puts(c.value)
+      c
+    })
   end
 
   def eval(env, expr)
@@ -262,14 +267,22 @@ def main
   root_env = Env.new
   e.setup_builtin(root_env)
   printer = Printer.new
-  loop do
-    print "> "
-    line = gets
-    break unless line
-    parser = Parser.new(Tokenizer.new(read_all(StringIO.new(line))))
+  if  FileTest.pipe?($stdin)
+    parser = Parser.new(Tokenizer.new(read_all(StringIO.new($stdin.read))))
     s_expr_list = parser.parse
     s_expr_list.each do |s_expr|
-      printer.print(e.eval(root_env, s_expr))
+      e.eval(root_env, s_expr)
+    end
+  else
+    loop do
+      print "> "
+      line = gets
+      break unless line
+      parser = Parser.new(Tokenizer.new(read_all(StringIO.new(line))))
+      s_expr_list = parser.parse
+      s_expr_list.each do |s_expr|
+        printer.print(e.eval(root_env, s_expr))
+      end
     end
   end
 end
