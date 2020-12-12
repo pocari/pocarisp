@@ -61,6 +61,10 @@ end
 class Evaluator
   include LispConstants
   def setup_builtin(env)
+    env.add("t", -> (e, expr) {
+      ltrue
+    })
+
     env.add("atom", -> (e, expr) {
       Atom === expr ? ltrue : lnil
     })
@@ -158,6 +162,24 @@ class Evaluator
       ret
     })
 
+    env.add("if", -> (e, list) {
+      raise 'too few arguments given to -' if lnil?(list)
+      c = list
+
+      condition = c.car
+      c = c.cdr
+      ccc = eval(e, condition)
+      if not lnil?(ccc)
+        raise 'too few arguments given to -' if lnil?(c)
+        eval(e, c.car)
+      else
+        raise 'too few arguments given to -' if lnil?(c)
+        c = c.cdr
+        raise 'too few arguments given to -' if lnil?(c)
+        eval(e, c.car)
+      end
+    })
+
     env.add("dump_env", -> (e, _) {
       # p [:dump_env, e.keys]
       lnil
@@ -167,6 +189,8 @@ class Evaluator
 
   def eval(env, expr)
     case expr
+    when Nil
+      lnil
     when Ident
       # p [:find_var, expr.value, @scope]
       env.find(expr.value)
