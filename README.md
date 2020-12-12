@@ -22,7 +22,7 @@ lisp implemented by Ruby
   (if (= n 1)
     1
     (* n (fact (- n 1)))))
-(princ (fact 10))%
+(princ (fact 10))
 % cat sample.lsp | ruby pocarisp.rb
 3628800
 ```
